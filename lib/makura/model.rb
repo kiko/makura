@@ -246,12 +246,13 @@ module Makura
 
       def layout(name, opts = {})
         design[name] = layout = Layout.new(name, design)
-        unless opts[:map] or opts[:reduce]
-          prefix = self.name.gsub(/\B[A-Z][^A-Z]/, '_\&')
+
+        unless opts[:map] || opts[:reduce]
+          prefix = self.name.gsub('::', '/')
         end
 
-        map_name    = opts[:map]    || "#{prefix}_#{name}".downcase
-        reduce_name = opts[:reduce] || "#{prefix}_#{name}".downcase
+        map_name    = opts[:map]    || "#{prefix}/#{name}".downcase
+        reduce_name = opts[:reduce] || "#{prefix}/#{name}".downcase
 
         layout.load_map(map_name)
         layout.load_reduce(reduce_name)
@@ -320,7 +321,7 @@ module Makura
       def multi_fetch(name, opts = {})
         keys = opts.delete(:keys) || opts.delete('keys')
         opts.merge!(:payload => {'keys' => Array(keys)})
-        hash = database.post("_view/#{self}/#{name}", opts)
+        hash = database.post("#{Makura.escape(self)}/_view/#{name}", opts)
         convert_raw(hash['rows'])
       end
 
