@@ -7,7 +7,7 @@ module Makura
       File.join(Makura::ROOT, '../couch')
     ]
 
-    def initialize(name, design = nil)
+    def initialize(name, design)
       @name, @design = name, design
       @design[name] = self
       @map = @reduce = nil
@@ -37,7 +37,8 @@ module Makura
     def common_load(type, file_or_function)
       return unless file_or_function
 
-      if file_or_function =~ /function\(.*\)/
+      case file_or_function
+      when /function\(.*\)/, /^_(sum|count|stats)$/
         function = file_or_function
       else
         parts = file_or_function.to_s.split('::')
